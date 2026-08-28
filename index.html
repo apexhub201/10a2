@@ -115,7 +115,8 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
+            font-size: 14px;
+            font-weight: 800;
             box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
         }
 
@@ -192,7 +193,7 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .theme-toggle:hover,
@@ -315,6 +316,7 @@
             align-items: center;
             gap: 8px;
             backdrop-filter: blur(10px);
+            white-space: nowrap;
         }
 
         .toolbar-btn:hover {
@@ -575,6 +577,8 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 500px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             animation: slideUp 0.3s ease;
             position: relative;
         }
@@ -655,6 +659,7 @@
             gap: 10px;
             justify-content: flex-end;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -873,6 +878,8 @@
             display: flex;
             gap: 20px;
             margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .landing-stats {
@@ -926,15 +933,38 @@
             background: rgba(108, 92, 231, 0.2);
         }
 
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .access-denied h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .access-denied p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
                 width: 280px;
                 z-index: 1500;
+                position: fixed;
             }
 
             .sidebar.mobile-open {
                 transform: translateX(0);
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
             }
 
             .sidebar-overlay {
@@ -968,10 +998,12 @@
                 font-size: 16px;
             }
 
+            /* Giữ layout giống máy tính */
             .desks-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
+                flex-direction: row;
+                gap: 40px;
+                justify-content: center;
+                align-items: flex-start;
             }
 
             .desk-column.left,
@@ -980,11 +1012,11 @@
             }
 
             .classroom-map-inner {
-                min-width: 100%;
+                min-width: 800px;
             }
 
             .desk-row {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 justify-content: center;
             }
 
@@ -992,50 +1024,32 @@
                 min-width: 200px;
             }
 
+            .desk {
+                min-width: 100px;
+            }
+
+            .seat {
+                min-height: 60px;
+                padding: 8px 6px;
+            }
+
+            .seat-name {
+                font-size: 11px;
+            }
+
+            .seat-info {
+                font-size: 9px;
+            }
+
+            .seat-role {
+                font-size: 8px;
+                padding: 1px 6px;
+            }
+
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        @media (max-width: 480px) {
-            .header {
-                padding: 0 10px;
-            }
-
-            .logo-text {
-                font-size: 14px;
-            }
-
-            .logo-subtext {
-                display: none;
-            }
-
-            .header-right {
-                gap: 8px;
-            }
-
-            .status-indicator {
-                display: none;
-            }
-
-            .main-content {
-                padding: 10px;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
-
-            .landing-buttons {
-                flex-direction: column;
-            }
-        }
-
-        .mobile-menu-btn {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: flex;
                 width: 40px;
@@ -1054,23 +1068,96 @@
             .mobile-menu-btn:hover {
                 background: var(--card-hover);
             }
+
+            .status-indicator {
+                display: none;
+            }
+
+            .header-right {
+                gap: 8px;
+            }
+
+            .logo-text {
+                font-size: 14px;
+            }
+
+            .logo-subtext {
+                display: none;
+            }
+
+            .header {
+                padding: 0 10px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+
+            .landing-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .landing-buttons button {
+                width: 100%;
+            }
+
+            .canvas-toolbar {
+                gap: 5px;
+            }
+
+            .toolbar-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
         }
 
-        .access-denied {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
+        @media (max-width: 480px) {
+            .landing-title {
+                font-size: 28px;
+            }
 
-        .access-denied h2 {
-            font-size: 32px;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
+            .landing-description {
+                font-size: 14px;
+            }
 
-        .access-denied p {
-            font-size: 16px;
-            margin-bottom: 20px;
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .desk.double {
+                min-width: 150px;
+            }
+
+            .desks-container {
+                gap: 20px;
+            }
+
+            .seat-name {
+                font-size: 10px;
+            }
+
+            .seat-info {
+                font-size: 8px;
+            }
+
+            .seat-role {
+                font-size: 7px;
+                padding: 1px 4px;
+            }
         }
     </style>
 </head>
@@ -1171,10 +1258,10 @@
                     <div class="stat-label">Bàn</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">32 / 39</div>
+                    <div class="stat-value" id="registeredCount">0 / 39</div>
                     <div class="stat-label">Đã đăng ký</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 82%;"></div>
+                        <div class="progress-fill" id="registerProgress" style="width: 0%;"></div>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -1193,31 +1280,8 @@
                             <th>Thời gian</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Đăng ký vị trí</td>
-                            <td>2 phút trước</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Trần Thị B</td>
-                            <td>Cập nhật thông tin</td>
-                            <td>15 phút trước</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Lê Văn C</td>
-                            <td>Đăng ký vị trí</td>
-                            <td>1 giờ trước</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Phạm Thị D</td>
-                            <td>Reset vị trí</td>
-                            <td>2 giờ trước</td>
-                        </tr>
+                    <tbody id="activityTableBody">
+                        <!-- Generated by JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -1228,10 +1292,10 @@
             <div class="canvas-container">
                 <div class="canvas-toolbar">
                     <button class="toolbar-btn" onclick="zoomIn()" title="Phóng to">
-                        Zoom In
+                        +
                     </button>
                     <button class="toolbar-btn" onclick="zoomOut()" title="Thu nhỏ">
-                        Zoom Out
+                        -
                     </button>
                     <button class="toolbar-btn" onclick="resetZoom()" title="Reset Zoom">
                         Reset
@@ -1240,13 +1304,13 @@
                         Fullscreen
                     </button>
                     <button class="toolbar-btn" id="editModeBtn" onclick="toggleEditMode()" title="Chỉnh sửa sơ đồ" style="display: none;">
-                        Chỉnh sửa sơ đồ
+                        Chỉnh sửa
                     </button>
                     <button class="toolbar-btn success" onclick="saveMap()" title="Lưu thay đổi" style="display: none;">
-                        Lưu thay đổi
+                        Lưu
                     </button>
                     <button class="toolbar-btn" onclick="undoChanges()" title="Hoàn tác" style="display: none;">
-                        Hoàn tác
+                        Undo
                     </button>
                 </div>
                 <div class="classroom-map" id="classroomMap">
@@ -1274,18 +1338,18 @@
         <!-- Student List Page -->
         <div id="studentListPage" style="display: none;">
             <div class="table-container">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                     <h3>Danh sách học sinh</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" class="form-input" placeholder="Tìm kiếm..." style="width: 250px;" id="searchInput">
-                        <select class="form-select" style="width: 150px;" id="groupFilter">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" class="form-input" placeholder="Tìm kiếm..." style="width: 200px;" id="searchInput" oninput="filterStudents()">
+                        <select class="form-select" style="width: 150px;" id="groupFilter" onchange="filterStudents()">
                             <option value="">Tất cả tổ</option>
                             <option value="1">Tổ 1</option>
                             <option value="2">Tổ 2</option>
                             <option value="3">Tổ 3</option>
                             <option value="4">Tổ 4</option>
                         </select>
-                        <select class="form-select" style="width: 180px;" id="roleFilter">
+                        <select class="form-select" style="width: 180px;" id="roleFilter" onchange="filterStudents()">
                             <option value="">Tất cả chức vụ</option>
                             <option value="leader">Lớp trưởng</option>
                             <option value="vice">Lớp phó</option>
@@ -1335,8 +1399,8 @@
                 </div>
                 <div style="margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px;">
                     <h4>Thêm chức vụ mới</h4>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <input type="text" class="form-input" id="newRoleName" placeholder="Nhập tên chức vụ mới...">
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <input type="text" class="form-input" id="newRoleName" placeholder="Nhập tên chức vụ mới..." style="flex: 1; min-width: 200px;">
                         <button class="toolbar-btn primary" onclick="addNewRole()">
                             Thêm chức vụ
                         </button>
@@ -1351,26 +1415,26 @@
                 <h3>Quản lý tổ</h3>
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
                     <div class="stat-card" style="flex: 1; min-width: 200px;">
-                        <div class="stat-value">10</div>
+                        <div class="stat-value" id="group1Count">10</div>
                         <div class="stat-label">Tổ 1</div>
                     </div>
                     <div class="stat-card" style="flex: 1; min-width: 200px;">
-                        <div class="stat-value">10</div>
+                        <div class="stat-value" id="group2Count">10</div>
                         <div class="stat-label">Tổ 2</div>
                     </div>
                     <div class="stat-card" style="flex: 1; min-width: 200px;">
-                        <div class="stat-value">10</div>
+                        <div class="stat-value" id="group3Count">10</div>
                         <div class="stat-label">Tổ 3</div>
                     </div>
                     <div class="stat-card" style="flex: 1; min-width: 200px;">
-                        <div class="stat-value">9</div>
+                        <div class="stat-value" id="group4Count">9</div>
                         <div class="stat-label">Tổ 4</div>
                     </div>
                 </div>
                 <div style="margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px;">
                     <h4>Thêm tổ mới</h4>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <input type="text" class="form-input" id="newGroupName" placeholder="Nhập tên tổ mới...">
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <input type="text" class="form-input" id="newGroupName" placeholder="Nhập tên tổ mới..." style="flex: 1; min-width: 200px;">
                         <button class="toolbar-btn primary" onclick="addNewGroup()">
                             Thêm tổ
                         </button>
@@ -1493,7 +1557,8 @@
                 { id: 'group-leader', name: 'Tổ trưởng' },
                 { id: 'group-vice', name: 'Tổ phó' },
                 { id: 'member', name: 'Thành viên' }
-            ]
+            ],
+            activities: []
         };
 
         // Generate 39 sample students
@@ -1527,54 +1592,47 @@
             }
         }
 
-        // Generate 24 desks with 39 seats
+        // Generate 24 desks with 48 seats
         function generateDesks() {
-            const layout = {
-                right: [
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 }
-                ],
-                left: [
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 },
-                    { seats: 2 }, { seats: 2 }
-                ]
-            };
-
             let deskId = 1;
             let seatId = 1;
 
-            for (const side of ['left', 'right']) {
-                layout[side].forEach((deskConfig, rowIndex) => {
-                    for (let deskIndex = 0; deskIndex < deskConfig.seats; deskIndex++) {
-                        const desk = {
-                            id: deskId,
-                            side: side,
-                            row: rowIndex + 1,
-                            column: deskIndex + 1,
-                            seats: [],
-                            position: { x: 0, y: 0 }
-                        };
+            // Left side: 4 columns x 6 rows
+            for (let row = 1; row <= 6; row++) {
+                for (let col = 1; col <= 4; col++) {
+                    const desk = {
+                        id: deskId,
+                        side: 'left',
+                        row: row,
+                        column: col,
+                        seats: [
+                            { id: seatId++, studentId: null },
+                            { id: seatId++, studentId: null }
+                        ],
+                        position: { x: 0, y: 0 }
+                    };
+                    classData.desks.push(desk);
+                    deskId++;
+                }
+            }
 
-                        for (let seatIndex = 0; seatIndex < deskConfig.seats; seatIndex++) {
-                            desk.seats.push({
-                                id: seatId,
-                                studentId: null
-                            });
-                            seatId++;
-                        }
-
-                        classData.desks.push(desk);
-                        deskId++;
-                    }
-                });
+            // Right side: 4 columns x 6 rows
+            for (let row = 1; row <= 6; row++) {
+                for (let col = 1; col <= 4; col++) {
+                    const desk = {
+                        id: deskId,
+                        side: 'right',
+                        row: row,
+                        column: col,
+                        seats: [
+                            { id: seatId++, studentId: null },
+                            { id: seatId++, studentId: null }
+                        ],
+                        position: { x: 0, y: 0 }
+                    };
+                    classData.desks.push(desk);
+                    deskId++;
+                }
             }
         }
 
@@ -1680,6 +1738,40 @@
             };
         }
 
+        function addActivity(studentName, action) {
+            classData.activities.unshift({
+                id: classData.activities.length + 1,
+                studentName: studentName,
+                action: action,
+                time: new Date().toLocaleTimeString('vi-VN')
+            });
+            
+            // Keep only last 10 activities
+            if (classData.activities.length > 10) {
+                classData.activities = classData.activities.slice(0, 10);
+            }
+            
+            renderActivities();
+        }
+
+        function renderActivities() {
+            const tbody = document.getElementById('activityTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            classData.activities.forEach((activity, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${activity.studentName}</td>
+                    <td>${activity.action}</td>
+                    <td>${activity.time}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
         // ============ THEME MANAGEMENT ============
         function toggleTheme() {
             const body = document.body;
@@ -1750,6 +1842,11 @@
             
             // Update admin controls visibility
             updateAdminControls();
+            
+            // Close mobile sidebar after navigation
+            if (window.innerWidth <= 768) {
+                toggleMobileSidebar();
+            }
         }
 
         function showAccessDenied(pageId) {
@@ -1808,6 +1905,7 @@
                 return;
             }
             showPage('dashboardPage');
+            updateDashboardStats();
         }
 
         function showClassMap(event) {
@@ -1841,6 +1939,7 @@
                 return;
             }
             showPage('groupsPage');
+            updateGroupStats();
         }
 
         function showDeskManagement(event) {
@@ -1886,6 +1985,26 @@
             
             sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('show');
+        }
+
+        // ============ DASHBOARD ============
+        function updateDashboardStats() {
+            const registeredStudents = classData.students.filter(s => s.seatId !== null).length;
+            const totalStudents = classData.students.length;
+            
+            const registeredCount = document.getElementById('registeredCount');
+            const registerProgress = document.getElementById('registerProgress');
+            
+            if (registeredCount) {
+                registeredCount.textContent = `${registeredStudents} / ${totalStudents}`;
+            }
+            
+            if (registerProgress) {
+                const percentage = (registeredStudents / totalStudents) * 100;
+                registerProgress.style.width = `${percentage}%`;
+            }
+            
+            renderActivities();
         }
 
         // ============ CLASS MAP RENDERING ============
@@ -1985,11 +2104,7 @@
             const student = classData.students.find(s => s.seatId === seatId);
             
             if (student) {
-                if (isAdmin) {
-                    showSeatInfoModal(seatId, student);
-                } else {
-                    showToast('Vị trí đã được đăng ký', 'warning');
-                }
+                showSeatInfoModal(seatId, student);
             } else {
                 showRegisterModal(seatId);
             }
@@ -2020,19 +2135,23 @@
                 <div class="form-group">
                     <label>Tổ</label>
                     <select class="form-select" id="studentGroup">
-                        <option value="1">Tổ 1</option>
-                        <option value="2">Tổ 2</option>
-                        <option value="3">Tổ 3</option>
-                        <option value="4">Tổ 4</option>
+                        ${classData.groups.map(group => 
+                            `<option value="${group.id}">${group.name}</option>`
+                        ).join('')}
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Chức vụ</label>
-                    <select class="form-select" id="studentRole">
+                    <select class="form-select" id="studentRole" onchange="handleRoleSelectChange()">
                         ${classData.roles.map(role => 
                             `<option value="${role.id}">${role.name}</option>`
                         ).join('')}
+                        <option value="custom">Khác...</option>
                     </select>
+                </div>
+                <div class="form-group" id="customRoleGroup" style="display: none;">
+                    <label>Nhập chức vụ mới</label>
+                    <input type="text" class="form-input" id="customRoleInput" placeholder="Nhập chức vụ mới...">
                 </div>
             `;
             
@@ -2055,14 +2174,46 @@
             showModal('Đăng ký vị trí', content, buttons);
         }
 
+        function handleRoleSelectChange() {
+            const roleSelect = document.getElementById('studentRole');
+            const customRoleGroup = document.getElementById('customRoleGroup');
+            
+            if (roleSelect && customRoleGroup) {
+                if (roleSelect.value === 'custom') {
+                    customRoleGroup.style.display = 'block';
+                } else {
+                    customRoleGroup.style.display = 'none';
+                }
+            }
+        }
+
         function registerStudent(seatId) {
             const nameInput = document.getElementById('studentName');
             const groupSelect = document.getElementById('studentGroup');
             const roleSelect = document.getElementById('studentRole');
+            const customRoleInput = document.getElementById('customRoleInput');
             
             if (!nameInput.value.trim()) {
                 showToast('Vui lòng nhập họ và tên', 'error');
                 return;
+            }
+            
+            let role = roleSelect.value;
+            if (role === 'custom') {
+                const customRoleName = customRoleInput.value.trim();
+                if (!customRoleName) {
+                    showToast('Vui lòng nhập tên chức vụ', 'error');
+                    return;
+                }
+                
+                const newRoleId = customRoleName.toLowerCase().replace(/\s+/g, '-');
+                if (!classData.roles.find(r => r.id === newRoleId)) {
+                    classData.roles.push({
+                        id: newRoleId,
+                        name: customRoleName
+                    });
+                }
+                role = newRoleId;
             }
             
             const confirmBtn = document.getElementById('modal-btn-confirm-btn');
@@ -2074,7 +2225,7 @@
                     id: classData.students.length + 1,
                     name: nameInput.value.trim(),
                     group: parseInt(groupSelect.value),
-                    role: roleSelect.value,
+                    role: role,
                     seatId: seatId,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
@@ -2088,10 +2239,14 @@
                     seatInfo.seat.studentId = newStudent.id;
                 }
                 
+                // Add activity
+                addActivity(newStudent.name, 'Đăng ký vị trí');
+                
                 restoreButton();
                 closeModal();
                 renderClassMap();
                 renderStudentList();
+                updateDashboardStats();
                 showToast('Đăng ký vị trí thành công', 'success');
                 
                 // Add glow effect to the seat
@@ -2107,7 +2262,7 @@
 
         function showSeatInfoModal(seatId, student) {
             const roleName = classData.roles.find(r => r.id === student.role)?.name || 'Thành viên';
-            const groupName = `Tổ ${student.group}`;
+            const groupName = classData.groups.find(g => g.id === student.group)?.name || `Tổ ${student.group}`;
             
             const content = `
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -2153,9 +2308,14 @@
                 seatInfo.seat.studentId = null;
             }
             
+            if (student) {
+                addActivity(student.name, 'Reset vị trí');
+            }
+            
             closeModal();
             renderClassMap();
             renderStudentList();
+            updateDashboardStats();
             showToast('Đã reset vị trí', 'success');
         }
 
@@ -2165,6 +2325,57 @@
             tbody.innerHTML = '';
             
             classData.students.forEach((student, index) => {
+                const row = document.createElement('tr');
+                
+                const roleName = classData.roles.find(r => r.id === student.role)?.name || 'Thành viên';
+                const seatId = student.seatId || 'Chưa đăng ký';
+                const status = student.seatId ? '✅ Đã đăng ký' : '❌ Chưa đăng ký';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student.name}</td>
+                    <td>Tổ ${student.group}</td>
+                    <td>${roleName}</td>
+                    <td>${seatId}</td>
+                    <td>${status}</td>
+                    <td>
+                        ${isAdmin ? `
+                        <button class="toolbar-btn" style="padding: 5px 10px; font-size: 12px;" onclick="editStudent(${student.id})">
+                            Sửa
+                        </button>
+                        <button class="toolbar-btn" style="padding: 5px 10px; font-size: 12px;" onclick="deleteStudent(${student.id})">
+                            Xóa
+                        </button>
+                        ${student.seatId ? `
+                        <button class="toolbar-btn" style="padding: 5px 10px; font-size: 12px;" onclick="resetStudentSeat(${student.id})">
+                            Reset
+                        </button>
+                        ` : ''}
+                        ` : ''}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterStudents() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const groupFilter = document.getElementById('groupFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+            
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            
+            const filteredStudents = classData.students.filter(student => {
+                const matchSearch = student.name.toLowerCase().includes(searchInput);
+                const matchGroup = !groupFilter || student.group === parseInt(groupFilter);
+                const matchRole = !roleFilter || student.role === roleFilter;
+                
+                return matchSearch && matchGroup && matchRole;
+            });
+            
+            filteredStudents.forEach((student, index) => {
                 const row = document.createElement('tr');
                 
                 const roleName = classData.roles.find(r => r.id === student.role)?.name || 'Thành viên';
@@ -2223,15 +2434,16 @@
                 </div>
                 <div class="form-group">
                     <label>Chức vụ</label>
-                    <select class="form-select" id="editRole">
+                    <select class="form-select" id="editRole" onchange="handleEditRoleChange()">
                         ${classData.roles.map(role => 
                             `<option value="${role.id}" ${student.role === role.id ? 'selected' : ''}>${role.name}</option>`
                         ).join('')}
+                        <option value="custom">Khác...</option>
                     </select>
                 </div>
-                <div class="form-group" id="customRoleGroup" style="display: none;">
-                    <label>Chức vụ mới</label>
-                    <input type="text" class="form-input" id="editCustomRole" placeholder="Nhập chức vụ mới...">
+                <div class="form-group" id="editCustomRoleGroup" style="display: none;">
+                    <label>Nhập chức vụ mới</label>
+                    <input type="text" class="form-input" id="editCustomRoleInput" placeholder="Nhập chức vụ mới...">
                 </div>
             `;
             
@@ -2251,20 +2463,19 @@
             ];
             
             showModal('Chỉnh sửa học sinh', content, buttons);
-            
-            // Handle role select change
+        }
+
+        function handleEditRoleChange() {
             const roleSelect = document.getElementById('editRole');
-            const customRoleGroup = document.getElementById('customRoleGroup');
-            roleSelect.addEventListener('change', () => {
+            const customRoleGroup = document.getElementById('editCustomRoleGroup');
+            
+            if (roleSelect && customRoleGroup) {
                 if (roleSelect.value === 'custom') {
                     customRoleGroup.style.display = 'block';
                 } else {
                     customRoleGroup.style.display = 'none';
                 }
-            });
-            
-            // Add custom role option
-            roleSelect.innerHTML += '<option value="custom">Chức vụ khác...</option>';
+            }
         }
 
         function saveStudentEdit(studentId) {
@@ -2274,15 +2485,21 @@
             const nameInput = document.getElementById('editName');
             const groupSelect = document.getElementById('editGroup');
             const roleSelect = document.getElementById('editRole');
-            const customRoleInput = document.getElementById('editCustomRole');
+            const customRoleInput = document.getElementById('editCustomRoleInput');
             
             let role = roleSelect.value;
-            if (role === 'custom' && customRoleInput && customRoleInput.value.trim()) {
-                const newRoleId = customRoleInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (role === 'custom') {
+                const customRoleName = customRoleInput.value.trim();
+                if (!customRoleName) {
+                    showToast('Vui lòng nhập tên chức vụ', 'error');
+                    return;
+                }
+                
+                const newRoleId = customRoleName.toLowerCase().replace(/\s+/g, '-');
                 if (!classData.roles.find(r => r.id === newRoleId)) {
                     classData.roles.push({
                         id: newRoleId,
-                        name: customRoleInput.value.trim()
+                        name: customRoleName
                     });
                 }
                 role = newRoleId;
@@ -2293,9 +2510,12 @@
             student.role = role;
             student.updatedAt = new Date().toISOString();
             
+            addActivity(student.name, 'Cập nhật thông tin');
+            
             closeModal();
             renderStudentList();
             renderClassMap();
+            updateDashboardStats();
             showToast('Cập nhật thành công', 'success');
         }
 
@@ -2332,10 +2552,14 @@
                                 seatInfo.seat.studentId = null;
                             }
                         }
+                        
+                        addActivity(student.name, 'Bị xóa khỏi hệ thống');
                         classData.students = classData.students.filter(s => s.id !== studentId);
+                        
                         closeModal();
                         renderStudentList();
                         renderClassMap();
+                        updateDashboardStats();
                         showToast('Đã xóa học sinh', 'success');
                     }
                 }
@@ -2361,8 +2585,11 @@
             student.seatId = null;
             student.updatedAt = new Date().toISOString();
             
+            addActivity(student.name, 'Reset vị trí');
+            
             renderStudentList();
             renderClassMap();
+            updateDashboardStats();
             showToast('Đã reset vị trí', 'success');
         }
 
@@ -2415,6 +2642,8 @@
             
             roleNameInput.value = '';
             renderRolesTable();
+            renderStudentList();
+            renderClassMap();
             showToast('Đã thêm chức vụ mới', 'success');
         }
 
@@ -2497,6 +2726,18 @@
         }
 
         // ============ GROUPS MANAGEMENT ============
+        function updateGroupStats() {
+            const group1Count = document.getElementById('group1Count');
+            const group2Count = document.getElementById('group2Count');
+            const group3Count = document.getElementById('group3Count');
+            const group4Count = document.getElementById('group4Count');
+            
+            if (group1Count) group1Count.textContent = classData.students.filter(s => s.group === 1).length;
+            if (group2Count) group2Count.textContent = classData.students.filter(s => s.group === 2).length;
+            if (group3Count) group3Count.textContent = classData.students.filter(s => s.group === 3).length;
+            if (group4Count) group4Count.textContent = classData.students.filter(s => s.group === 4).length;
+        }
+
         function addNewGroup() {
             const groupNameInput = document.getElementById('newGroupName');
             const groupName = groupNameInput.value.trim();
@@ -2513,6 +2754,13 @@
             
             classData.groups.push(newGroup);
             groupNameInput.value = '';
+            
+            // Update group select in register modal
+            const groupSelect = document.getElementById('studentGroup');
+            if (groupSelect) {
+                groupSelect.innerHTML += `<option value="${newGroup.id}">${newGroup.name}</option>`;
+            }
+            
             showGroups();
             showToast('Đã thêm tổ mới', 'success');
         }
@@ -2722,6 +2970,7 @@
                 // Show dashboard
                 showPage('dashboardPage');
                 updateAdminControls();
+                updateDashboardStats();
                 
                 // Restore landing page
                 const landingPage = document.getElementById('landingPage');
@@ -2773,13 +3022,13 @@
             const editBtn = document.getElementById('editModeBtn');
             
             if (isEditMode) {
-                editBtn.textContent = 'Hoàn tất chỉnh sửa';
+                editBtn.textContent = 'Hoàn tất';
                 editBtn.style.background = 'linear-gradient(135deg, var(--success) 0%, #00a884 100%)';
                 editBtn.style.color = 'white';
                 document.getElementById('classroomMap').classList.add('edit-mode');
                 showToast('Đã bật chế độ chỉnh sửa', 'warning');
             } else {
-                editBtn.textContent = 'Chỉnh sửa sơ đồ';
+                editBtn.textContent = 'Chỉnh sửa';
                 editBtn.style.background = '';
                 editBtn.style.color = '';
                 document.getElementById('classroomMap').classList.remove('edit-mode');
