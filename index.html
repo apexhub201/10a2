@@ -984,6 +984,7 @@
 
             .main-content {
                 margin-left: 0;
+                padding: 10px;
             }
 
             .header-center {
@@ -998,39 +999,45 @@
                 font-size: 16px;
             }
 
-            /* Giữ layout giống máy tính */
+            /* Đã sửa: Giữ nguyên 2 dãy song song trên mobile */
             .desks-container {
                 flex-direction: row;
-                gap: 40px;
-                justify-content: center;
                 align-items: flex-start;
+                gap: 20px;
+                justify-content: center;
+                overflow-x: auto;
+                padding-bottom: 10px;
             }
 
-            .desk-column.left,
+            .desk-column.left {
+                margin-right: 20px;
+            }
+
             .desk-column.right {
-                margin: 0;
+                margin-left: 20px;
             }
 
             .classroom-map-inner {
-                min-width: 800px;
+                min-width: 600px;
             }
 
             .desk-row {
                 flex-wrap: nowrap;
                 justify-content: center;
+                gap: 10px;
             }
 
             .desk.double {
-                min-width: 200px;
+                min-width: 160px;
             }
 
             .desk {
-                min-width: 100px;
+                min-width: 80px;
             }
 
             .seat {
-                min-height: 60px;
                 padding: 8px 6px;
+                min-height: 60px;
             }
 
             .seat-name {
@@ -1089,10 +1096,6 @@
                 padding: 0 10px;
             }
 
-            .main-content {
-                padding: 10px;
-            }
-
             .modal-content {
                 padding: 20px;
                 margin: 10px;
@@ -1138,12 +1141,26 @@
                 font-size: 28px;
             }
 
-            .desk.double {
-                min-width: 150px;
+            /* Đã sửa: Đảm bảo 2 dãy vẫn song song trên mobile nhỏ */
+            .desks-container {
+                gap: 15px;
+                justify-content: flex-start;
             }
 
-            .desks-container {
-                gap: 20px;
+            .desk-column.left {
+                margin-right: 15px;
+            }
+
+            .desk-column.right {
+                margin-left: 15px;
+            }
+
+            .desk.double {
+                min-width: 140px;
+            }
+
+            .desk {
+                min-width: 70px;
             }
 
             .seat-name {
@@ -1156,7 +1173,22 @@
 
             .seat-role {
                 font-size: 7px;
-                padding: 1px 4px;
+                padding: 1px 5px;
+            }
+
+            .board {
+                padding: 15px 40px;
+                font-size: 14px;
+            }
+
+            .teacher-desk {
+                padding: 10px 20px;
+                font-size: 12px;
+            }
+
+            .exit-door {
+                padding: 10px 15px;
+                font-size: 12px;
             }
         }
     </style>
@@ -1592,47 +1624,54 @@
             }
         }
 
-        // Generate 24 desks with 48 seats
+        // Generate 24 desks with 39 seats
         function generateDesks() {
+            const layout = {
+                right: [
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 }
+                ],
+                left: [
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 },
+                    { seats: 2 }, { seats: 2 }
+                ]
+            };
+
             let deskId = 1;
             let seatId = 1;
 
-            // Left side: 4 columns x 6 rows
-            for (let row = 1; row <= 6; row++) {
-                for (let col = 1; col <= 4; col++) {
-                    const desk = {
-                        id: deskId,
-                        side: 'left',
-                        row: row,
-                        column: col,
-                        seats: [
-                            { id: seatId++, studentId: null },
-                            { id: seatId++, studentId: null }
-                        ],
-                        position: { x: 0, y: 0 }
-                    };
-                    classData.desks.push(desk);
-                    deskId++;
-                }
-            }
+            for (const side of ['left', 'right']) {
+                layout[side].forEach((deskConfig, rowIndex) => {
+                    for (let deskIndex = 0; deskIndex < deskConfig.seats; deskIndex++) {
+                        const desk = {
+                            id: deskId,
+                            side: side,
+                            row: rowIndex + 1,
+                            column: deskIndex + 1,
+                            seats: [],
+                            position: { x: 0, y: 0 }
+                        };
 
-            // Right side: 4 columns x 6 rows
-            for (let row = 1; row <= 6; row++) {
-                for (let col = 1; col <= 4; col++) {
-                    const desk = {
-                        id: deskId,
-                        side: 'right',
-                        row: row,
-                        column: col,
-                        seats: [
-                            { id: seatId++, studentId: null },
-                            { id: seatId++, studentId: null }
-                        ],
-                        position: { x: 0, y: 0 }
-                    };
-                    classData.desks.push(desk);
-                    deskId++;
-                }
+                        for (let seatIndex = 0; seatIndex < deskConfig.seats; seatIndex++) {
+                            desk.seats.push({
+                                id: seatId,
+                                studentId: null
+                            });
+                            seatId++;
+                        }
+
+                        classData.desks.push(desk);
+                        deskId++;
+                    }
+                });
             }
         }
 
