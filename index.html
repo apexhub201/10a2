@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CLASS MAP 10A2 - Sơ đồ lớp học Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg-primary: #f0f4f8;
@@ -999,7 +1002,6 @@
                 font-size: 16px;
             }
 
-            /* Đã sửa: Giữ nguyên 2 dãy song song trên mobile */
             .desks-container {
                 flex-direction: row;
                 align-items: flex-start;
@@ -1141,7 +1143,6 @@
                 font-size: 28px;
             }
 
-            /* Đã sửa: Đảm bảo 2 dãy vẫn song song trên mobile nhỏ */
             .desks-container {
                 gap: 15px;
                 justify-content: flex-start;
@@ -1212,7 +1213,7 @@
         <div class="header-right">
             <div class="status-indicator">
                 <span class="status-dot"></span>
-                Online
+                <span id="connectionStatus">Đang kết nối...</span>
             </div>
             <button class="theme-toggle" onclick="toggleTheme()" title="Chuyển đổi chế độ">
                 <span id="themeIcon">🌙</span>
@@ -1249,6 +1250,7 @@
             <p class="landing-subtitle">Thiết kế và quản lý sơ đồ lớp 10A2</p>
             <p class="landing-description">
                 Chọn đúng vị trí của bạn. Để lớp học trở nên trực quan hơn.
+                Dữ liệu được đồng bộ realtime trên tất cả thiết bị.
             </p>
             <div class="landing-buttons">
                 <button class="toolbar-btn primary" onclick="showClassMap()">
@@ -1260,11 +1262,11 @@
             </div>
             <div class="landing-stats">
                 <div class="landing-stat">
-                    <div class="landing-stat-value">39</div>
+                    <div class="landing-stat-value" id="totalStudents">39</div>
                     <div class="landing-stat-label">Học sinh</div>
                 </div>
                 <div class="landing-stat">
-                    <div class="landing-stat-value">24</div>
+                    <div class="landing-stat-value" id="totalDesks">24</div>
                     <div class="landing-stat-label">Bàn</div>
                 </div>
                 <div class="landing-stat">
@@ -1272,8 +1274,8 @@
                     <div class="landing-stat-label">Tổ</div>
                 </div>
                 <div class="landing-stat">
-                    <div class="landing-stat-value">100%</div>
-                    <div class="landing-stat-label">Tương tác</div>
+                    <div class="landing-stat-value" id="totalRegistered">0</div>
+                    <div class="landing-stat-label">Đã đăng ký</div>
                 </div>
             </div>
         </div>
@@ -1282,11 +1284,11 @@
         <div id="dashboardPage" style="display: none;">
             <div class="dashboard-grid">
                 <div class="stat-card" onclick="showStudentList()">
-                    <div class="stat-value">39</div>
+                    <div class="stat-value" id="dashTotalStudents">39</div>
                     <div class="stat-label">Học sinh</div>
                 </div>
                 <div class="stat-card" onclick="showDeskManagement()">
-                    <div class="stat-value">24</div>
+                    <div class="stat-value" id="dashTotalDesks">24</div>
                     <div class="stat-label">Bàn</div>
                 </div>
                 <div class="stat-card">
@@ -1297,7 +1299,7 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">Online</div>
+                    <div class="stat-value" id="onlineStatus">Online</div>
                     <div class="stat-label">Trạng thái</div>
                 </div>
             </div>
@@ -1570,6 +1572,22 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // ============ FIREBASE CONFIGURATION ============
+        // THAY THẾ BẰNG CẤU HÌNH CỦA BẠN TỪ FIREBASE CONSOLE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // ============ DATA STRUCTURE ============
         const classData = {
             className: '10A2',
@@ -1624,7 +1642,7 @@
             }
         }
 
-        // Generate 24 desks with 39 seats
+        // Generate 24 desks with 48 seats
         function generateDesks() {
             const layout = {
                 right: [
@@ -1650,27 +1668,25 @@
 
             for (const side of ['left', 'right']) {
                 layout[side].forEach((deskConfig, rowIndex) => {
-                    for (let deskIndex = 0; deskIndex < deskConfig.seats; deskIndex++) {
-                        const desk = {
-                            id: deskId,
-                            side: side,
-                            row: rowIndex + 1,
-                            column: deskIndex + 1,
-                            seats: [],
-                            position: { x: 0, y: 0 }
-                        };
+                    const desk = {
+                        id: deskId,
+                        side: side,
+                        row: rowIndex + 1,
+                        column: 1,
+                        seats: [],
+                        position: { x: 0, y: 0 }
+                    };
 
-                        for (let seatIndex = 0; seatIndex < deskConfig.seats; seatIndex++) {
-                            desk.seats.push({
-                                id: seatId,
-                                studentId: null
-                            });
-                            seatId++;
-                        }
-
-                        classData.desks.push(desk);
-                        deskId++;
+                    for (let seatIndex = 0; seatIndex < deskConfig.seats; seatIndex++) {
+                        desk.seats.push({
+                            id: seatId,
+                            studentId: null
+                        });
+                        seatId++;
                     }
+
+                    classData.desks.push(desk);
+                    deskId++;
                 });
             }
         }
@@ -1678,6 +1694,82 @@
         // Initialize data
         generateStudents();
         generateDesks();
+
+        // ============ FIREBASE SYNC FUNCTIONS ============
+        function syncToFirebase() {
+            database.ref('classData').set({
+                students: classData.students,
+                desks: classData.desks,
+                groups: classData.groups,
+                roles: classData.roles,
+                activities: classData.activities,
+                className: classData.className,
+                schoolYear: classData.schoolYear,
+                teacher: classData.teacher,
+                lastUpdated: new Date().toISOString()
+            });
+        }
+
+        function loadFromFirebase() {
+            database.ref('classData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.students) classData.students = data.students;
+                    if (data.desks) classData.desks = data.desks;
+                    if (data.groups) classData.groups = data.groups;
+                    if (data.roles) classData.roles = data.roles;
+                    if (data.activities) classData.activities = data.activities;
+                    if (data.className) classData.className = data.className;
+                    if (data.schoolYear) classData.schoolYear = data.schoolYear;
+                    if (data.teacher) classData.teacher = data.teacher;
+                    
+                    // Update UI
+                    updateAllUI();
+                    updateConnectionStatus(true);
+                } else {
+                    // First time - sync initial data
+                    syncToFirebase();
+                    updateConnectionStatus(true);
+                }
+            }, (error) => {
+                console.error('Firebase error:', error);
+                updateConnectionStatus(false);
+            });
+        }
+
+        function updateConnectionStatus(connected) {
+            const connectionStatus = document.getElementById('connectionStatus');
+            const statusDot = document.querySelector('.status-dot');
+            
+            if (connected) {
+                connectionStatus.textContent = 'Online';
+                statusDot.style.background = 'var(--success)';
+            } else {
+                connectionStatus.textContent = 'Offline';
+                statusDot.style.background = 'var(--danger)';
+            }
+        }
+
+        function updateAllUI() {
+            renderClassMap();
+            renderStudentList();
+            updateDashboardStats();
+            updateGroupStats();
+            updateLandingStats();
+        }
+
+        function updateLandingStats() {
+            const totalStudents = document.getElementById('totalStudents');
+            const totalDesks = document.getElementById('totalDesks');
+            const totalRegistered = document.getElementById('totalRegistered');
+            
+            if (totalStudents) totalStudents.textContent = classData.students.length;
+            if (totalDesks) totalDesks.textContent = classData.desks.length;
+            if (totalRegistered) {
+                const registered = classData.students.filter(s => s.seatId !== null).length;
+                totalRegistered.textContent = registered;
+            }
+        }
 
         // ============ STATE MANAGEMENT ============
         let isAdmin = false;
@@ -1736,7 +1828,6 @@
             modalOverlay.appendChild(modalContent);
             modalContainer.appendChild(modalOverlay);
             
-            // Add event listeners to buttons
             if (buttons) {
                 buttons.forEach(button => {
                     const btnId = `modal-btn-${button.id || Date.now()}`;
@@ -1747,7 +1838,6 @@
                 });
             }
             
-            // Close modal when clicking outside
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay) {
                     closeModal();
@@ -1779,17 +1869,17 @@
 
         function addActivity(studentName, action) {
             classData.activities.unshift({
-                id: classData.activities.length + 1,
+                id: Date.now(),
                 studentName: studentName,
                 action: action,
                 time: new Date().toLocaleTimeString('vi-VN')
             });
             
-            // Keep only last 10 activities
-            if (classData.activities.length > 10) {
-                classData.activities = classData.activities.slice(0, 10);
+            if (classData.activities.length > 20) {
+                classData.activities = classData.activities.slice(0, 20);
             }
             
+            syncToFirebase();
             renderActivities();
         }
 
@@ -1844,7 +1934,6 @@
                 'importPage', 'exportPage', 'settingsPage'
             ];
             
-            // Check if page requires admin access
             if (adminOnlyPages.includes(pageId) && !isAdmin) {
                 showAccessDenied(pageId);
                 return;
@@ -1859,7 +1948,6 @@
             
             currentPage = pageId;
             
-            // Update sidebar active state
             const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
             sidebarLinks.forEach(link => link.classList.remove('active'));
             
@@ -1879,11 +1967,9 @@
                 sidebarLinks[pageMap[pageId]].classList.add('active');
             }
             
-            // Update admin controls visibility
             updateAdminControls();
             
-            // Close mobile sidebar after navigation
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 768 && currentPage !== 'landing') {
                 toggleMobileSidebar();
             }
         }
@@ -1902,7 +1988,6 @@
                 }
             });
             
-            // Show access denied message
             const landingPage = document.getElementById('landingPage');
             landingPage.style.display = 'block';
             landingPage.innerHTML = `
@@ -2033,6 +2118,8 @@
             
             const registeredCount = document.getElementById('registeredCount');
             const registerProgress = document.getElementById('registerProgress');
+            const dashTotalStudents = document.getElementById('dashTotalStudents');
+            const dashTotalDesks = document.getElementById('dashTotalDesks');
             
             if (registeredCount) {
                 registeredCount.textContent = `${registeredStudents} / ${totalStudents}`;
@@ -2043,6 +2130,9 @@
                 registerProgress.style.width = `${percentage}%`;
             }
             
+            if (dashTotalStudents) dashTotalStudents.textContent = totalStudents;
+            if (dashTotalDesks) dashTotalDesks.textContent = classData.desks.length;
+            
             renderActivities();
         }
 
@@ -2051,17 +2141,17 @@
             const leftColumn = document.getElementById('leftColumn');
             const rightColumn = document.getElementById('rightColumn');
             
+            if (!leftColumn || !rightColumn) return;
+            
             leftColumn.innerHTML = '';
             rightColumn.innerHTML = '';
             
             const leftDesks = classData.desks.filter(d => d.side === 'left');
             const rightDesks = classData.desks.filter(d => d.side === 'right');
             
-            // Group desks by row
             const leftRows = groupDesksByRow(leftDesks);
             const rightRows = groupDesksByRow(rightDesks);
             
-            // Render left column
             leftRows.forEach((rowDesks, rowIndex) => {
                 const rowElement = document.createElement('div');
                 rowElement.className = 'desk-row';
@@ -2073,7 +2163,6 @@
                 leftColumn.appendChild(rowElement);
             });
             
-            // Render right column
             rightRows.forEach((rowDesks, rowIndex) => {
                 const rowElement = document.createElement('div');
                 rowElement.className = 'desk-row';
@@ -2128,7 +2217,6 @@
                 deskElement.appendChild(seatElement);
             });
             
-            // Add drag functionality if in edit mode
             if (isEditMode) {
                 deskElement.draggable = true;
                 deskElement.addEventListener('dragstart', handleDragStart);
@@ -2139,7 +2227,6 @@
         }
 
         function handleSeatClick(seatId) {
-            const seat = findSeatById(seatId);
             const student = classData.students.find(s => s.seatId === seatId);
             
             if (student) {
@@ -2255,40 +2342,66 @@
                 role = newRoleId;
             }
             
+            // Check if name already exists
+            const existingStudent = classData.students.find(s => 
+                s.name.toLowerCase() === nameInput.value.trim().toLowerCase()
+            );
+            
+            if (existingStudent && existingStudent.seatId) {
+                showToast('Học sinh này đã đăng ký vị trí rồi!', 'warning');
+                return;
+            }
+            
             const confirmBtn = document.getElementById('modal-btn-confirm-btn');
             const restoreButton = showLoading(confirmBtn);
             
-            // Simulate loading
             setTimeout(() => {
-                const newStudent = {
-                    id: classData.students.length + 1,
-                    name: nameInput.value.trim(),
-                    group: parseInt(groupSelect.value),
-                    role: role,
-                    seatId: seatId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                
-                classData.students.push(newStudent);
-                
-                // Update seat
-                const seatInfo = findSeatById(seatId);
-                if (seatInfo) {
-                    seatInfo.seat.studentId = newStudent.id;
+                if (existingStudent) {
+                    // Update existing student
+                    existingStudent.seatId = seatId;
+                    existingStudent.group = parseInt(groupSelect.value);
+                    existingStudent.role = role;
+                    existingStudent.updatedAt = new Date().toISOString();
+                    
+                    const seatInfo = findSeatById(seatId);
+                    if (seatInfo) {
+                        seatInfo.seat.studentId = existingStudent.id;
+                    }
+                    
+                    addActivity(existingStudent.name, 'Cập nhật vị trí');
+                } else {
+                    // Create new student
+                    const newStudent = {
+                        id: Date.now(),
+                        name: nameInput.value.trim(),
+                        group: parseInt(groupSelect.value),
+                        role: role,
+                        seatId: seatId,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    classData.students.push(newStudent);
+                    
+                    const seatInfo = findSeatById(seatId);
+                    if (seatInfo) {
+                        seatInfo.seat.studentId = newStudent.id;
+                    }
+                    
+                    addActivity(newStudent.name, 'Đăng ký vị trí');
                 }
                 
-                // Add activity
-                addActivity(newStudent.name, 'Đăng ký vị trí');
+                // Sync to Firebase
+                syncToFirebase();
                 
                 restoreButton();
                 closeModal();
                 renderClassMap();
                 renderStudentList();
                 updateDashboardStats();
+                updateLandingStats();
                 showToast('Đăng ký vị trí thành công', 'success');
                 
-                // Add glow effect to the seat
                 const seatElement = document.getElementById(`seat-${seatId}`);
                 if (seatElement) {
                     seatElement.style.animation = 'glow 0.5s ease';
@@ -2351,16 +2464,20 @@
                 addActivity(student.name, 'Reset vị trí');
             }
             
+            syncToFirebase();
             closeModal();
             renderClassMap();
             renderStudentList();
             updateDashboardStats();
+            updateLandingStats();
             showToast('Đã reset vị trí', 'success');
         }
 
         // ============ STUDENT LIST RENDERING ============
         function renderStudentList() {
             const tbody = document.getElementById('studentTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             classData.students.forEach((student, index) => {
@@ -2550,11 +2667,13 @@
             student.updatedAt = new Date().toISOString();
             
             addActivity(student.name, 'Cập nhật thông tin');
+            syncToFirebase();
             
             closeModal();
             renderStudentList();
             renderClassMap();
             updateDashboardStats();
+            updateLandingStats();
             showToast('Cập nhật thành công', 'success');
         }
 
@@ -2594,11 +2713,13 @@
                         
                         addActivity(student.name, 'Bị xóa khỏi hệ thống');
                         classData.students = classData.students.filter(s => s.id !== studentId);
+                        syncToFirebase();
                         
                         closeModal();
                         renderStudentList();
                         renderClassMap();
                         updateDashboardStats();
+                        updateLandingStats();
                         showToast('Đã xóa học sinh', 'success');
                     }
                 }
@@ -2625,16 +2746,20 @@
             student.updatedAt = new Date().toISOString();
             
             addActivity(student.name, 'Reset vị trí');
+            syncToFirebase();
             
             renderStudentList();
             renderClassMap();
             updateDashboardStats();
+            updateLandingStats();
             showToast('Đã reset vị trí', 'success');
         }
 
         // ============ ROLES MANAGEMENT ============
         function renderRolesTable() {
             const tbody = document.getElementById('rolesTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             classData.roles.forEach((role, index) => {
@@ -2679,6 +2804,7 @@
                 name: roleName
             });
             
+            syncToFirebase();
             roleNameInput.value = '';
             renderRolesTable();
             renderStudentList();
@@ -2722,6 +2848,7 @@
             const roleNameInput = document.getElementById('editRoleName');
             role.name = roleNameInput.value;
             
+            syncToFirebase();
             closeModal();
             renderRolesTable();
             renderStudentList();
@@ -2752,6 +2879,7 @@
                     id: 'confirm-role-delete',
                     onClick: () => {
                         classData.roles = classData.roles.filter(r => r.id !== roleId);
+                        syncToFirebase();
                         closeModal();
                         renderRolesTable();
                         renderStudentList();
@@ -2792,9 +2920,9 @@
             };
             
             classData.groups.push(newGroup);
+            syncToFirebase();
             groupNameInput.value = '';
             
-            // Update group select in register modal
             const groupSelect = document.getElementById('studentGroup');
             if (groupSelect) {
                 groupSelect.innerHTML += `<option value="${newGroup.id}">${newGroup.name}</option>`;
@@ -2807,6 +2935,8 @@
         // ============ DESK MANAGEMENT ============
         function renderDeskTable() {
             const tbody = document.getElementById('deskTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             classData.desks.forEach((desk, index) => {
@@ -2889,7 +3019,7 @@
             if (newSeatCount > currentSeatCount) {
                 for (let i = currentSeatCount; i < newSeatCount; i++) {
                     desk.seats.push({
-                        id: classData.desks.reduce((max, d) => Math.max(max, d.seats.length), 0) + i + 1,
+                        id: Date.now() + i,
                         studentId: null
                     });
                 }
@@ -2897,6 +3027,7 @@
                 desk.seats = desk.seats.slice(0, newSeatCount);
             }
             
+            syncToFirebase();
             closeModal();
             renderDeskTable();
             renderClassMap();
@@ -2926,6 +3057,7 @@
                     id: 'confirm-desk-delete',
                     onClick: () => {
                         classData.desks = classData.desks.filter(d => d.id !== deskId);
+                        syncToFirebase();
                         closeModal();
                         renderDeskTable();
                         renderClassMap();
@@ -2948,7 +3080,6 @@
                 const file = e.target.files[0];
                 if (file) {
                     showToast(`Đang import file: ${file.name}`, 'warning');
-                    // In production, parse the file here
                     setTimeout(() => {
                         showToast('Import thành công', 'success');
                     }, 2000);
@@ -2991,64 +3122,64 @@
             const usernameInput = document.getElementById('adminUsername');
             const passwordInput = document.getElementById('adminPassword');
             
-            // Mock authentication - in production, this should be server-side
             if (usernameInput.value === 'admin' && passwordInput.value === 'admin123') {
                 isAdmin = true;
                 closeModal();
                 showToast('Đăng nhập thành công', 'success');
                 
-                // Update UI
                 const avatarBtn = document.getElementById('avatarBtn');
                 avatarBtn.textContent = '👮';
                 avatarBtn.title = 'Đăng xuất Admin';
                 
-                // Show sidebar if hidden
                 const sidebar = document.getElementById('sidebar');
                 sidebar.classList.remove('sidebar-hidden');
                 
-                // Show dashboard
                 showPage('dashboardPage');
                 updateAdminControls();
                 updateDashboardStats();
                 
-                // Restore landing page
-                const landingPage = document.getElementById('landingPage');
-                landingPage.innerHTML = `
-                    <h1 class="landing-title">CLASS MAP</h1>
-                    <p class="landing-subtitle">Thiết kế và quản lý sơ đồ lớp 10A2</p>
-                    <p class="landing-description">
-                        Chọn đúng vị trí của bạn. Để lớp học trở nên trực quan hơn.
-                    </p>
-                    <div class="landing-buttons">
-                        <button class="toolbar-btn primary" onclick="showClassMap()">
-                            Xem sơ đồ lớp
-                        </button>
-                        <button class="toolbar-btn" onclick="showAdminLogin()">
-                            Admin Login
-                        </button>
-                    </div>
-                    <div class="landing-stats">
-                        <div class="landing-stat">
-                            <div class="landing-stat-value">39</div>
-                            <div class="landing-stat-label">Học sinh</div>
-                        </div>
-                        <div class="landing-stat">
-                            <div class="landing-stat-value">24</div>
-                            <div class="landing-stat-label">Bàn</div>
-                        </div>
-                        <div class="landing-stat">
-                            <div class="landing-stat-value">4</div>
-                            <div class="landing-stat-label">Tổ</div>
-                        </div>
-                        <div class="landing-stat">
-                            <div class="landing-stat-value">100%</div>
-                            <div class="landing-stat-label">Tương tác</div>
-                        </div>
-                    </div>
-                `;
+                restoreLandingPage();
             } else {
                 showToast('Sai tên đăng nhập hoặc mật khẩu', 'error');
             }
+        }
+
+        function restoreLandingPage() {
+            const landingPage = document.getElementById('landingPage');
+            landingPage.innerHTML = `
+                <h1 class="landing-title">CLASS MAP</h1>
+                <p class="landing-subtitle">Thiết kế và quản lý sơ đồ lớp 10A2</p>
+                <p class="landing-description">
+                    Chọn đúng vị trí của bạn. Để lớp học trở nên trực quan hơn.
+                    Dữ liệu được đồng bộ realtime trên tất cả thiết bị.
+                </p>
+                <div class="landing-buttons">
+                    <button class="toolbar-btn primary" onclick="showClassMap()">
+                        Xem sơ đồ lớp
+                    </button>
+                    <button class="toolbar-btn" onclick="showAdminLogin()">
+                        Admin Login
+                    </button>
+                </div>
+                <div class="landing-stats">
+                    <div class="landing-stat">
+                        <div class="landing-stat-value" id="totalStudents">${classData.students.length}</div>
+                        <div class="landing-stat-label">Học sinh</div>
+                    </div>
+                    <div class="landing-stat">
+                        <div class="landing-stat-value" id="totalDesks">${classData.desks.length}</div>
+                        <div class="landing-stat-label">Bàn</div>
+                    </div>
+                    <div class="landing-stat">
+                        <div class="landing-stat-value">4</div>
+                        <div class="landing-stat-label">Tổ</div>
+                    </div>
+                    <div class="landing-stat">
+                        <div class="landing-stat-value" id="totalRegistered">${classData.students.filter(s => s.seatId !== null).length}</div>
+                        <div class="landing-stat-label">Đã đăng ký</div>
+                    </div>
+                </div>
+            `;
         }
 
         function toggleEditMode() {
@@ -3082,6 +3213,7 @@
                 showToast('Bạn cần quyền Admin', 'error');
                 return;
             }
+            syncToFirebase();
             showToast('Đã lưu thay đổi', 'success');
         }
 
@@ -3090,6 +3222,7 @@
                 showToast('Bạn cần quyền Admin', 'error');
                 return;
             }
+            loadFromFirebase();
             showToast('Đã hoàn tác', 'warning');
         }
 
@@ -3140,7 +3273,6 @@
         // ============ EXPORT FUNCTIONS ============
         function exportPNG() {
             const mapElement = document.getElementById('classroomMap');
-            // In production, use html2canvas or similar library
             showToast('Đang xuất PNG...', 'warning');
             setTimeout(() => {
                 showToast('Xuất PNG thành công', 'success');
@@ -3148,7 +3280,6 @@
         }
 
         function exportPDF() {
-            // In production, use jsPDF or similar library
             showToast('Đang xuất PDF...', 'warning');
             setTimeout(() => {
                 showToast('Xuất PDF thành công', 'success');
@@ -3190,6 +3321,7 @@
             classData.schoolYear = schoolYearInput.value;
             classData.teacher = teacherInput.value;
             
+            syncToFirebase();
             showToast('Đã lưu cài đặt', 'success');
         }
 
@@ -3199,34 +3331,16 @@
             showPage('landingPage');
             updateAdminControls();
             
-            // Load data from localStorage if exists
-            const savedData = localStorage.getItem('classMapData');
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    if (parsedData.students) {
-                        classData.students = parsedData.students;
-                    }
-                } catch (error) {
-                    console.error('Error loading saved data:', error);
-                }
-            }
+            // Load data from Firebase
+            loadFromFirebase();
             
-            // Save data periodically
-            setInterval(() => {
-                localStorage.setItem('classMapData', JSON.stringify({
-                    students: classData.students,
-                    desks: classData.desks,
-                    groups: classData.groups,
-                    roles: classData.roles
-                }));
-            }, 30000);
-            
-            // Render initial class map
+            // Render initial UI
             renderClassMap();
             renderStudentList();
+            updateLandingStats();
             
             console.log('CLASS MAP 10A2 initialized successfully');
+            console.log('Dữ liệu đang được đồng bộ realtime qua Firebase');
             console.log('Admin login: admin / admin123');
         }
 
